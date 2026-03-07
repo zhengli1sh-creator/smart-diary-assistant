@@ -96,6 +96,7 @@ async function executeTool(
   name: string,
   args: Record<string, unknown>,
   userId: string,
+  tokens: { accessToken?: string; refreshToken?: string },
 ): Promise<string> {
   try {
     switch (name) {
@@ -104,6 +105,7 @@ async function executeTool(
           userId,
           args.timeMin as string,
           args.timeMax as string,
+          tokens,
         );
         if (events.length === 0) return '该时间段内没有日历事件。';
         return JSON.stringify(events, null, 2);
@@ -115,7 +117,7 @@ async function executeTool(
           start: args.start as string,
           end: args.end as string,
           description: args.description as string | undefined,
-        });
+        }, tokens);
         return `日程已创建成功：${JSON.stringify(event, null, 2)}`;
       }
 
@@ -124,6 +126,7 @@ async function executeTool(
           userId,
           args.query as string,
           (args.maxResults as number) ?? 5,
+          tokens,
         );
         if (messages.length === 0) return '没有找到符合条件的邮件。';
         return JSON.stringify(messages, null, 2);
@@ -194,6 +197,10 @@ export async function POST(req: Request) {
   // In NextAuth v5 beta, we must pass the request to auth() in API routes
   const session = await auth();
   const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
+  const tokens = {
+    accessToken: (session as any)?.accessToken as string | undefined,
+    refreshToken: (session as any)?.refreshToken as string | undefined,
+  };
 
   const { messages } = await req.json();
 
@@ -250,7 +257,7 @@ ${userId ? '✅ 用户已登录 Google 账号，可使用日历和邮件功能�
 
     for (const toolCall of assistantMessage.tool_calls) {
       const args = JSON.parse(toolCall.function.arguments || '{}');
-      const result = await executeTool(toolCall.function.name, args, userId);
+      const result = await executeTool(toolCall.function.name, args, userId, tokens);
       toolMessages.push({
         role: 'tool',
         tool_call_id: toolCall.id,

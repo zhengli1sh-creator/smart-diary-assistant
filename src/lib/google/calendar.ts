@@ -19,8 +19,9 @@ export async function getCalendarEvents(
   userId: string,
   timeMin: string,
   timeMax: string,
+  tokens?: { accessToken?: string; refreshToken?: string },
 ): Promise<CalendarEvent[]> {
-  const auth = await getGoogleOAuthClient(userId);
+  const auth = await getGoogleOAuthClient(userId, tokens);
   const calendar = google.calendar({ version: 'v3', auth });
 
   const res = await calendar.events.list({
@@ -52,8 +53,9 @@ export async function createCalendarEvent(
     end: string;
     description?: string;
   },
+  tokens?: { accessToken?: string; refreshToken?: string },
 ): Promise<CalendarEvent> {
-  const auth = await getGoogleOAuthClient(userId);
+  const auth = await getGoogleOAuthClient(userId, tokens);
   const calendar = google.calendar({ version: 'v3', auth });
 
   const res = await calendar.events.insert({

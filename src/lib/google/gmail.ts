@@ -19,8 +19,9 @@ export async function searchGmailMessages(
   userId: string,
   query: string,
   maxResults = 10,
+  tokens?: { accessToken?: string; refreshToken?: string },
 ): Promise<GmailMessage[]> {
-  const auth = await getGoogleOAuthClient(userId);
+  const auth = await getGoogleOAuthClient(userId, tokens);
   const gmail = google.gmail({ version: 'v1', auth });
 
   // Step 1: Get message IDs

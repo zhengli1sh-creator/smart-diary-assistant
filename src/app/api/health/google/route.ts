@@ -10,7 +10,17 @@ export async function GET() {
       return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401 });
     }
 
-    const oauth = await getGoogleOAuthClient(session.user.id);
+    const sessionAny = session as any;
+    const tokens = {
+      accessToken: sessionAny.accessToken as string | undefined,
+      refreshToken: sessionAny.refreshToken as string | undefined,
+    };
+
+    if (!tokens.accessToken) {
+      return NextResponse.json({ ok: false, error: 'google_auth_failed' });
+    }
+
+    const oauth = await getGoogleOAuthClient(session.user.id, tokens);
     const calendar = google.calendar({ version: 'v3', auth: oauth });
     
     // Lightweight check: Attempt to list calendars to verify token validity
