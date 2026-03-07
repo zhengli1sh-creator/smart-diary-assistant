@@ -20,46 +20,66 @@ export default function Home() {
   const [isGoogleHealthOk, setIsGoogleHealthOk] = useState<boolean>(true);
   const [showSettings, setShowSettings] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [interimText, setInterimText] = useState("");
   
   // Custom Web Speech API ref
   const recognitionRef = useRef<any>(null);
+
+  // Keep a ref to the latest input so we don't need it in useEffect deps
+  const inputRef = useRef(input);
+  useEffect(() => {
+    inputRef.current = input;
+  }, [input]);
 
   // Initialize Speech Recognition
   useEffect(() => {
     if (typeof window !== "undefined") {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
-        recognitionRef.current = new SpeechRecognition();
-        recognitionRef.current.continuous = true;
-        recognitionRef.current.interimResults = true;
-        recognitionRef.current.lang = 'zh-CN'; // Default to Mandarin, but works for mixed
+        const recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        recognition.lang = 'zh-CN';
 
-        recognitionRef.current.onresult = (event: any) => {
-          let currentTranscript = '';
+        recognition.onresult = (event: any) => {
+          let currentFinal = '';
+          let currentInterim = '';
+          
           for (let i = event.resultIndex; i < event.results.length; ++i) {
             if (event.results[i].isFinal) {
-              currentTranscript += event.results[i][0].transcript;
+              currentFinal += event.results[i][0].transcript;
+            } else {
+              currentInterim += event.results[i][0].transcript;
             }
           }
-          if (currentTranscript) {
-            // Append the new final transcript to the existing input
+          
+          setInterimText(currentInterim);
+
+          if (currentFinal) {
+            // Append the new final transcript to the input box immediately
+            const previousInput = inputRef.current;
+            const newText = previousInput ? previousInput + ' ' + currentFinal : currentFinal;
             handleInputChange({
-              target: { value: input ? input + ' ' + currentTranscript : currentTranscript }
+              target: { value: newText }
             } as any);
           }
         };
 
-        recognitionRef.current.onerror = (event: any) => {
+        recognition.onerror = (event: any) => {
           console.error("Speech recognition error:", event.error);
           setIsListening(false);
+          setInterimText("");
         };
 
-        recognitionRef.current.onend = () => {
+        recognition.onend = () => {
           setIsListening(false);
+          setInterimText("");
         };
+
+        recognitionRef.current = recognition;
       }
     }
-  }, [input, handleInputChange]);
+  }, [handleInputChange]);
 
   const toggleListening = () => {
     if (!recognitionRef.current) {
@@ -70,12 +90,13 @@ export default function Home() {
     if (isListening) {
       recognitionRef.current.stop();
       setIsListening(false);
+      setInterimText("");
     } else {
       try {
         recognitionRef.current.start();
         setIsListening(true);
+        setInterimText("");
       } catch (e) {
-        // Handle case where it might already be started
         console.error(e);
       }
     }
@@ -220,7 +241,7 @@ export default function Home() {
           </button>
           <textarea
             id="chat-input"
-            value={input}
+            value={input + (isListening && interimText ? interimText : '')}
             onChange={handleInputChange}
             placeholder="随时记录..."
             className="flex-1 bg-transparent max-h-32 min-h-[40px] py-2.5 text-[15px] text-gray-800 placeholder-gray-400 focus:outline-none resize-none leading-tight"
