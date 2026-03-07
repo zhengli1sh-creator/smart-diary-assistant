@@ -27,8 +27,12 @@ export async function GET() {
     await calendar.calendarList.list({ maxResults: 1 });
     
     return NextResponse.json({ ok: true });
-  } catch (err) {
+  } catch (err: any) {
     console.error('Google Health Check Failed:', err);
-    return NextResponse.json({ ok: false, error: 'google_auth_failed' });
+    return NextResponse.json({ 
+      ok: false, 
+      error: 'google_auth_failed', 
+      details: err?.message || String(err)
+    });
   }
 }
