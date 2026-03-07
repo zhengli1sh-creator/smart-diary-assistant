@@ -9,7 +9,7 @@ export const users = sqliteTable('users', {
 });
 
 export const accounts = sqliteTable('accounts', {
-  userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('userId').notNull(),
   type: text('type').notNull(),
   provider: text('provider').notNull(),
   providerAccountId: text('providerAccountId').notNull(),
@@ -26,7 +26,7 @@ export const accounts = sqliteTable('accounts', {
 
 export const sessions = sqliteTable('session', {
   sessionToken: text('sessionToken').primaryKey(),
-  userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('userId').notNull(),
   expires: integer('expires', { mode: 'timestamp_ms' }).notNull(),
 });
 
@@ -40,7 +40,7 @@ export const verificationTokens = sqliteTable('verificationToken', {
 
 export const chatMessages = sqliteTable('chat_messages', {
   id: text('id').primaryKey(),
-  userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('userId').notNull(),
   role: text('role').notNull(), // 'user' | 'assistant' | 'system' | 'data'
   content: text('content').notNull(),
   createdAt: integer('createdAt', { mode: 'timestamp_ms' }).notNull(),
@@ -48,7 +48,7 @@ export const chatMessages = sqliteTable('chat_messages', {
 
 export const diaryEntries = sqliteTable('diary_entries', {
   id: text('id').primaryKey(),
-  userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('userId').notNull(),
   category: text('category').notNull(), // 'study', 'work', 'life'
   content: text('content').notNull(),
   mood: text('mood'),
@@ -60,7 +60,7 @@ export const diaryEntries = sqliteTable('diary_entries', {
 
 export const tasks = sqliteTable('tasks', {
   id: text('id').primaryKey(),
-  userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('userId').notNull(),
   title: text('title').notNull(),
   dueDate: text('dueDate'), // ISO format or natural lang string extracted
   status: text('status').notNull().default('pending'), // 'pending' | 'completed'
@@ -71,7 +71,7 @@ export const tasks = sqliteTable('tasks', {
 
 export const structuredMemories = sqliteTable('structured_memories', {
   id: text('id').primaryKey(),
-  userId: text('userId').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  userId: text('userId').notNull(),
   category: text('category').notNull(), // 'study', 'work', 'life', 'general'
   type: text('type').notNull(), // 'fact', 'preference', 'goal', 'ongoing_project'
   content: text('content').notNull(),
