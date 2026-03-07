@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { Send, Mic, Calendar, Settings, AlertTriangle } from "lucide-react";
+import { Send, Mic, Calendar, Settings, AlertTriangle, LogOut } from "lucide-react";
 import { useChat } from "@ai-sdk/react";
+import { signOut } from "next-auth/react";
 
 export default function Home() {
   const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
@@ -17,6 +18,7 @@ export default function Home() {
   });
 
   const [isGoogleHealthOk, setIsGoogleHealthOk] = useState<boolean>(true);
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     fetch("/api/health/google")
@@ -54,13 +56,37 @@ export default function Home() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 text-gray-400">
+        <div className="flex items-center gap-3 text-gray-400 relative">
           <button className="hover:text-gray-600 transition-colors">
             <Calendar size={20} />
           </button>
-          <button className="hover:text-gray-600 transition-colors">
-            <Settings size={20} />
-          </button>
+          
+          <div className="relative">
+            <button 
+              onClick={() => setShowSettings(!showSettings)}
+              className="hover:text-gray-600 transition-colors focus:outline-none"
+            >
+              <Settings size={20} />
+            </button>
+            
+            {showSettings && (
+              <>
+                <div 
+                  className="fixed inset-0 z-10" 
+                  onClick={() => setShowSettings(false)}
+                />
+                <div className="absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-20">
+                  <button
+                    onClick={() => signOut({ callbackUrl: '/api/auth/signin' })}
+                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    <LogOut size={16} />
+                    <span>退出登录</span>
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
