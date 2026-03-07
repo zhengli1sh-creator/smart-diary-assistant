@@ -9,18 +9,38 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@ai-sdk/deepseek": "^2.0.25",
+    "@ai-sdk/google": "^3.0.43",
+    "@ai-sdk/openai": "^0.0.72",
+    "@ai-sdk/react": "^0.0.60",
+    "@auth/drizzle-adapter": "^1.11.1",
+    "@google/genai": "^1.44.0",
+    "@libsql/client": "^0.17.0",
+    "ai": "^3.4.33",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "dotenv": "^17.3.1",
+    "drizzle-orm": "^0.45.1",
+    "googleapis": "^171.4.0",
+    "lucide-react": "^0.577.0",
     "next": "16.1.6",
+    "next-auth": "^5.0.0-beta.30",
+    "next-pwa": "^5.6.0",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@serverless/utils": "^6.15.0",
     "@tailwindcss/postcss": "^4",
+    "@types/next-pwa": "^5.6.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "drizzle-kit": "^0.31.9",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }
