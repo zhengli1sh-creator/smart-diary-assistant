@@ -170,7 +170,7 @@ export default function Home() {
                 />
                 <div className="absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-20">
                   <button
-                    onClick={() => signOut({ callbackUrl: '/api/auth/signin' })}
+                    onClick={() => signOut({ callbackUrl: '/' })}
                     className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                   >
                     <LogOut size={16} />
