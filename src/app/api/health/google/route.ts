@@ -27,8 +27,13 @@ export async function GET() {
     const oauth = await getGoogleOAuthClient(session.user.id, tokens);
     const calendar = google.calendar({ version: 'v3', auth: oauth });
     
-    // Lightweight check: Attempt to list calendars to verify token validity
-    await calendar.calendarList.list({ maxResults: 1 });
+    // Lightweight check: Attempt to list events to verify token validity
+    // We only requested 'calendar.events' scope, so checking calendarList would fail
+    await calendar.events.list({
+      calendarId: 'primary',
+      maxResults: 1,
+      timeMin: new Date().toISOString(),
+    });
     
     return NextResponse.json({ ok: true });
   } catch (err: any) {
