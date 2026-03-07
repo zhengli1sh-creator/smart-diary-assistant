@@ -17,7 +17,11 @@ export async function GET() {
     };
 
     if (!tokens.accessToken) {
-      return NextResponse.json({ ok: false, error: 'google_auth_failed' });
+      return NextResponse.json({ 
+        ok: false, 
+        error: 'missing_access_token',
+        debug_session: sessionAny
+      });
     }
 
     const oauth = await getGoogleOAuthClient(session.user.id, tokens);
