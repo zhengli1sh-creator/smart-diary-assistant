@@ -1,16 +1,9 @@
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { db } from "@/lib/db";
-import { accounts, users } from "@/lib/db/schema";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   session: { strategy: 'jwt' },
-  adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-  }),
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID,
@@ -33,20 +26,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   ],
 
   callbacks: {
-    async jwt({ token, user }) {
-      // Persist the user's DB id into the JWT on first sign-in
-      if (user) {
-        token.id = user.id;
+    async jwt({ token, account }) {
+      // On first sign-in, persist Google's access/refresh tokens for API calls
+      if (account) {
+        token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        // token.sub is Google's unique permanent user ID (set automatically)
       }
       return token;
     },
     async session({ session, token }) {
-      // Expose the id in the session for API routes
-      if (session.user && token.id) {
-        (session.user as { id?: string }).id = token.id as string;
+      // Expose the Google sub as session.user.id for API routes
+      if (session.user && token.sub) {
+        (session.user as { id?: string }).id = token.sub;
       }
+      // Expose Google tokens so we can call Calendar/Gmail APIs
+      (session as any).accessToken = token.accessToken;
+      (session as any).refreshToken = token.refreshToken;
       return session;
     },
   },
 });
+
 
