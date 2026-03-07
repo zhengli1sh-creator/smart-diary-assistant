@@ -198,12 +198,12 @@ export default function Home() {
       {!isGoogleHealthOk && (
         <div className="bg-red-50 text-red-600 border-b border-red-100 text-[13px] px-4 py-2.5 flex items-center justify-between z-10 sticky top-[57px] shadow-sm">
           <div className="flex items-center gap-2">
-            <AlertTriangle size={16} />
-            <span>Google 授权已过期，日历与邮箱功能受限</span>
+            <AlertTriangle size={16} className="min-w-[16px]" />
+            <span>缺少日历/邮箱权限。请重新授权并<b>务必勾选所有权限框</b>。</span>
           </div>
           <button 
-            className="underline font-medium hover:text-red-700" 
-            onClick={() => window.location.href = '/api/auth/signin'}
+            className="underline font-medium hover:text-red-700 whitespace-nowrap ml-4" 
+            onClick={() => signIn('google')}
           >
             重新授权
           </button>
