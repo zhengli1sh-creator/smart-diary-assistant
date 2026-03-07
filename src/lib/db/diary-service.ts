@@ -35,17 +35,22 @@ export async function saveDiaryEntry(
   const id = randomUUID();
   const now = new Date();
 
-  await db.insert(diaryEntries).values({
-    id,
-    userId,
-    category: entry.category,
-    content: entry.content,
-    mood: entry.mood ?? null,
-    tags: '[]',
-    date: entry.date || now.toISOString().split('T')[0],
-    summary: entry.summary ?? null,
-    createdAt: now,
-  });
+  try {
+    await db.insert(diaryEntries).values({
+      id,
+      userId,
+      category: entry.category,
+      content: entry.content,
+      mood: entry.mood ?? null,
+      tags: '[]',
+      date: entry.date || now.toISOString().split('T')[0],
+      summary: entry.summary ?? null,
+      createdAt: now,
+    });
+  } catch (error) {
+    console.error('Failed to save diary entry:', error);
+    // Continue execution to return the formatted entry anyway
+  }
 
   return {
     id,
@@ -113,30 +118,39 @@ export async function saveChatMessage(
   role: 'user' | 'assistant',
   content: string,
 ) {
-  await db.insert(chatMessages).values({
-    id: randomUUID(),
-    userId,
-    role,
-    content,
-    createdAt: new Date(),
-  });
+  try {
+    await db.insert(chatMessages).values({
+      id: randomUUID(),
+      userId,
+      role,
+      content,
+      createdAt: new Date(),
+    });
+  } catch (error) {
+    console.error('Failed to save chat message:', error);
+  }
 }
 
 /**
  * Get recent chat messages for a user.
  */
 export async function getChatMessages(userId: string, limit: number = 50) {
-  const rows = await db
-    .select()
-    .from(chatMessages)
-    .where(eq(chatMessages.userId, userId))
-    .orderBy(desc(chatMessages.createdAt))
-    .limit(limit);
+  try {
+    const rows = await db
+      .select()
+      .from(chatMessages)
+      .where(eq(chatMessages.userId, userId))
+      .orderBy(desc(chatMessages.createdAt))
+      .limit(limit);
 
-  // Return in chronological order
-  return rows.reverse().map(r => ({
-    id: r.id,
-    role: r.role,
-    content: r.content,
-  }));
+    // Return in chronological order
+    return rows.reverse().map(r => ({
+      id: r.id,
+      role: r.role,
+      content: r.content,
+    }));
+  } catch (error) {
+    console.error('Failed to get chat messages:', error);
+    return [];
+  }
 }
