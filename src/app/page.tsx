@@ -19,6 +19,67 @@ export default function Home() {
 
   const [isGoogleHealthOk, setIsGoogleHealthOk] = useState<boolean>(true);
   const [showSettings, setShowSettings] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  
+  // Custom Web Speech API ref
+  const recognitionRef = useRef<any>(null);
+
+  // Initialize Speech Recognition
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        recognitionRef.current = new SpeechRecognition();
+        recognitionRef.current.continuous = true;
+        recognitionRef.current.interimResults = true;
+        recognitionRef.current.lang = 'zh-CN'; // Default to Mandarin, but works for mixed
+
+        recognitionRef.current.onresult = (event: any) => {
+          let currentTranscript = '';
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+              currentTranscript += event.results[i][0].transcript;
+            }
+          }
+          if (currentTranscript) {
+            // Append the new final transcript to the existing input
+            handleInputChange({
+              target: { value: input ? input + ' ' + currentTranscript : currentTranscript }
+            } as any);
+          }
+        };
+
+        recognitionRef.current.onerror = (event: any) => {
+          console.error("Speech recognition error:", event.error);
+          setIsListening(false);
+        };
+
+        recognitionRef.current.onend = () => {
+          setIsListening(false);
+        };
+      }
+    }
+  }, [input, handleInputChange]);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      alert("抱歉，您的浏览器不支持语音输入。推荐使用 Chrome 或 Safari。");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      try {
+        recognitionRef.current.start();
+        setIsListening(true);
+      } catch (e) {
+        // Handle case where it might already be started
+        console.error(e);
+      }
+    }
+  };
 
   useEffect(() => {
     fetch("/api/health/google")
@@ -148,7 +209,12 @@ export default function Home() {
         >
           <button
             type="button"
-            className="p-2.5 text-gray-400 hover:text-blue-500 transition-colors flex-shrink-0"
+            onClick={toggleListening}
+            className={`p-2.5 transition-colors flex-shrink-0 rounded-full ${
+              isListening 
+                ? 'text-red-500 bg-red-50 animate-pulse' 
+                : 'text-gray-400 hover:text-blue-500'
+            }`}
           >
             <Mic size={20} />
           </button>
