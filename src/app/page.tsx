@@ -1,14 +1,15 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { Send, Mic, Calendar, Settings, AlertTriangle, LogOut } from "lucide-react";
+import { Send, Mic, Calendar, Settings, AlertTriangle, LogOut, LogIn } from "lucide-react";
 import { useChat } from "@ai-sdk/react";
-import { signOut } from "next-auth/react";
+import { signOut, signIn, useSession } from "next-auth/react";
 
 export default function Home() {
   const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
     api: "/api/chat",
   });
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     fetch("/api/chat")
@@ -169,13 +170,23 @@ export default function Home() {
                   onClick={() => setShowSettings(false)}
                 />
                 <div className="absolute right-0 mt-2 w-32 bg-white rounded-xl shadow-lg border border-gray-100 py-1.5 z-20">
-                  <button
-                    onClick={() => signOut({ callbackUrl: '/' })}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                  >
-                    <LogOut size={16} />
-                    <span>退出登录</span>
-                  </button>
+                  {session ? (
+                    <button
+                      onClick={() => signOut({ callbackUrl: '/' })}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut size={16} />
+                      <span>退出登录</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => signIn('google')}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 transition-colors"
+                    >
+                      <LogIn size={16} />
+                      <span>登录</span>
+                    </button>
+                  )}
                 </div>
               </>
             )}
