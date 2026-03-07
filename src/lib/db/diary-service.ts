@@ -121,3 +121,22 @@ export async function saveChatMessage(
     createdAt: new Date(),
   });
 }
+
+/**
+ * Get recent chat messages for a user.
+ */
+export async function getChatMessages(userId: string, limit: number = 50) {
+  const rows = await db
+    .select()
+    .from(chatMessages)
+    .where(eq(chatMessages.userId, userId))
+    .orderBy(desc(chatMessages.createdAt))
+    .limit(limit);
+
+  // Return in chronological order
+  return rows.reverse().map(r => ({
+    id: r.id,
+    role: r.role,
+    content: r.content,
+  }));
+}

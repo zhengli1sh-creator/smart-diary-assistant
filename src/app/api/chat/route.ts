@@ -1,7 +1,7 @@
 import { auth } from '@/auth';
 import { getCalendarEvents, createCalendarEvent } from '@/lib/google/calendar';
 import { searchGmailMessages } from '@/lib/google/gmail';
-import { saveDiaryEntry, queryDiaryEntries, saveChatMessage, DiaryCategory } from '@/lib/db/diary-service';
+import { saveDiaryEntry, queryDiaryEntries, saveChatMessage, getChatMessages, DiaryCategory } from '@/lib/db/diary-service';
 
 export const maxDuration = 60;
 
@@ -162,6 +162,33 @@ async function executeTool(
 }
 
 // ─── Main Route Handler ──────────────────────────────────────
+
+export async function GET(req: Request) {
+  const session = await auth();
+  const userId = (session?.user as { id?: string } | undefined)?.id ?? null;
+
+  if (!userId) {
+    return new Response(JSON.stringify([]), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  try {
+    const history = await getChatMessages(userId, 50); // Get last 50 messages
+    return new Response(JSON.stringify(history), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  } catch (error) {
+    console.error('[GET /api/chat] Error fetching history:', error);
+    return new Response(JSON.stringify([]), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+}
+
 export async function POST(req: Request) {
   // Authenticate the user via NextAuth session cookie
   // In NextAuth v5 beta, we must pass the request to auth() in API routes

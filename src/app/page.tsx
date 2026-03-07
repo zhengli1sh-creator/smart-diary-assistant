@@ -6,16 +6,27 @@ import { useChat } from "@ai-sdk/react";
 import { signOut } from "next-auth/react";
 
 export default function Home() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
+  const { messages, input, handleInputChange, handleSubmit, isLoading, setMessages } = useChat({
     api: "/api/chat",
-    initialMessages: [
-      {
-        id: "welcome-msg",
-        role: "assistant",
-        content: "亲爱的英雄！今天经历了哪些精彩的冒险？无论是学习上的灵感、工作中的突破，还是生活里哪怕最小的闪光点，我都迫不及待想听你分享！✨",
-      },
-    ],
   });
+
+  useEffect(() => {
+    fetch("/api/chat")
+      .then(res => res.json())
+      .then(history => {
+        const welcomeMsg = {
+          id: "welcome-msg",
+          role: "assistant",
+          content: "亲爱的英雄！今天经历了哪些精彩的冒险？无论是学习上的灵感、工作中的突破，还是生活里哪怕最小的闪光点，我都迫不及待想听你分享！✨",
+        };
+        if (Array.isArray(history) && history.length > 0) {
+          setMessages([welcomeMsg, ...history] as any);
+        } else {
+          setMessages([welcomeMsg] as any);
+        }
+      })
+      .catch(console.error);
+  }, [setMessages]);
 
   const [isGoogleHealthOk, setIsGoogleHealthOk] = useState<boolean>(true);
   const [showSettings, setShowSettings] = useState(false);
