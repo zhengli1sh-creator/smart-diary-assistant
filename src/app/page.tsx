@@ -2,7 +2,7 @@
 
 import { useRef, useEffect, useState } from "react";
 import { Send, Mic, Calendar, Settings, AlertTriangle, LogOut, LogIn } from "lucide-react";
-import { useChat } from "@ai-sdk/react";
+import { useChat } from "ai/react";
 import { signOut, signIn, useSession } from "next-auth/react";
 
 export default function Home() {
