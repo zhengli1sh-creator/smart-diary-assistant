@@ -31,13 +31,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (account) {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
-        // token.sub is Google's unique permanent user ID (set automatically)
+        // Explicitly store the permanent Google ID to prevent NextAuth from generating random UUIDs
+        token.providerAccountId = account.providerAccountId;
       }
       return token;
     },
     async session({ session, token }) {
-      // Expose the Google sub as session.user.id for API routes
-      if (session.user && token.sub) {
+      // Expose the permanent Google ID as session.user.id
+      if (session.user && token.providerAccountId) {
+        (session.user as { id?: string }).id = token.providerAccountId as string;
+      } else if (session.user && token.sub) {
+        // Fallback for current active sessions that might still only have a sub
         (session.user as { id?: string }).id = token.sub;
       }
       // Expose Google tokens so we can call Calendar/Gmail APIs
