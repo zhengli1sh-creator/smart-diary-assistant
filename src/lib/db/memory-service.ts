@@ -1,5 +1,6 @@
 import { db } from '@/lib/db';
 import { structuredMemories, tasks } from '@/lib/db/schema';
+import { eq, desc } from 'drizzle-orm';
 import { randomUUID } from 'crypto';
 
 export type MemoryCategory = 'study' | 'work' | 'life' | 'general';
@@ -27,6 +28,15 @@ export async function saveMemories(userId: string, memories: SaveMemoryParams[])
     createdAt: new Date(),
   }));
   await db.insert(structuredMemories).values(values);
+}
+
+/**
+ * Get extracted structured memories for a user.
+ */
+export async function getMemories(userId: string) {
+  return await db.select().from(structuredMemories)
+    .where(eq(structuredMemories.userId, userId))
+    .orderBy(desc(structuredMemories.createdAt));
 }
 
 export interface SaveTaskParams {
