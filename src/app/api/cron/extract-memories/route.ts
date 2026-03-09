@@ -9,11 +9,8 @@ import { saveMemories, saveTasks } from '@/lib/db/memory-service';
 
 export const maxDuration = 60; // Allow more time for LLM processing
 
-// Initialize the OpenAI provider with DeepSeek's base URL
-const deepseek = createOpenAI({
-  baseURL: 'https://api.deepseek.com/v1',
-  apiKey: process.env.DEEPSEEK_API_KEY || '',
-});
+// Initialize the OpenAI provider with DeepSeek's base URL inside the handler to support local scripting
+
 
 const ExtractionSchema = z.object({
   memories: z.array(
@@ -43,6 +40,11 @@ export async function GET(req: Request) {
       return new Response('Unauthorized', { status: 401 });
     }
   }
+
+  const deepseek = createOpenAI({
+    baseURL: 'https://api.deepseek.com/v1',
+    apiKey: process.env.DEEPSEEK_API_KEY || '',
+  });
 
   try {
     const url = new URL(req.url);
