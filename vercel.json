@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/extract-memories",
+      "schedule": "0 18 * * *"
+    },
+    {
+      "path": "/api/cron/evening-reminder",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/morning-briefing",
+      "schedule": "0 0 * * *"
+    }
+  ]
+}
