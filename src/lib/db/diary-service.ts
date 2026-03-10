@@ -35,22 +35,17 @@ export async function saveDiaryEntry(
   const id = randomUUID();
   const now = new Date();
 
-  try {
-    await db.insert(diaryEntries).values({
-      id,
-      userId,
-      category: entry.category,
-      content: entry.content,
-      mood: entry.mood ?? null,
-      tags: '[]',
-      date: entry.date || now.toISOString().split('T')[0],
-      summary: entry.summary ?? null,
-      createdAt: now,
-    });
-  } catch (error) {
-    console.error('Failed to save diary entry:', error);
-    // Continue execution to return the formatted entry anyway
-  }
+  await db.insert(diaryEntries).values({
+    id,
+    userId,
+    category: entry.category,
+    content: entry.content,
+    mood: entry.mood ?? null,
+    tags: '[]',
+    date: entry.date || now.toISOString().split('T')[0],
+    summary: entry.summary ?? null,
+    createdAt: now,
+  });
 
   return {
     id,
