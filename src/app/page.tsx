@@ -170,15 +170,15 @@ export default function Home() {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 text-gray-400 relative">
-          <Link href="/vault" className="hover:text-purple-500 transition-colors" title="记忆库 (Memory Vault)">
+        <div className="flex items-center gap-3.5 text-gray-400">
+          <Link href="/vault" className="hover:text-purple-500 transition-colors flex items-center" title="记忆库 (Memory Vault)">
             <Brain size={20} />
           </Link>
           <a 
             href="https://calendar.google.com" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="hover:text-blue-500 transition-colors" 
+            className="hover:text-blue-500 transition-colors flex items-center" 
             title="查看 Google 日历"
           >
             <Calendar size={20} />
@@ -187,16 +187,16 @@ export default function Home() {
             href="https://mail.google.com" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="hover:text-red-500 transition-colors" 
+            className="hover:text-red-500 transition-colors flex items-center" 
             title="查看 Gmail 邮箱"
           >
             <Mail size={20} />
           </a>
           
-          <div className="relative">
+          <div className="relative flex items-center">
             <button 
               onClick={() => setShowSettings(!showSettings)}
-              className="hover:text-gray-600 transition-colors focus:outline-none"
+              className="hover:text-gray-600 transition-colors focus:outline-none flex items-center"
             >
               <Settings size={20} />
             </button>
