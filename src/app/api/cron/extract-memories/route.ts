@@ -114,6 +114,7 @@ ${compiledText}
 
       // 4. Save to DB
       if (object.memories.length > 0) {
+        console.log(`[DEBUG] Saving ${object.memories.length} memories for userId: ${user.id}`);
         const memoryItems = object.memories.map(m => ({
           ...m,
           date: targetDate,

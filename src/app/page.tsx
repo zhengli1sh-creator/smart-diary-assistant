@@ -50,7 +50,8 @@ export default function Home() {
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (SpeechRecognition) {
         const recognition = new SpeechRecognition();
-        recognition.continuous = true;
+        // Set continuous to false for better mobile compatibility (avoids silent failures)
+        recognition.continuous = false; 
         recognition.interimResults = true;
         recognition.lang = 'zh-CN';
 
@@ -71,22 +72,38 @@ export default function Home() {
           if (currentFinal) {
             // Append the new final transcript to the input box immediately
             const previousInput = inputRef.current;
-            const newText = previousInput ? previousInput + ' ' + currentFinal : currentFinal;
+            const separator = previousInput && !previousInput.endsWith(' ') ? ' ' : '';
             handleInputChange({
-              target: { value: newText }
+              target: { value: previousInput + separator + currentFinal }
             } as any);
           }
         };
 
         recognition.onerror = (event: any) => {
           console.error("Speech recognition error:", event.error);
+          // Don't stop listening on minor errors like 'no-speech'
+          if (event.error === 'no-speech' || event.error === 'audio-capture') {
+             // Silence these common mobile timeout errors
+             return;
+          }
           setIsListening(false);
           setInterimText("");
         };
 
         recognition.onend = () => {
-          setIsListening(false);
-          setInterimText("");
+          // AUTO-RESTART logic for non-continuous mode
+          // If the user hasn't manually stopped, restart immediately
+          if (recognitionRef.current && (window as any)._isListeningTarget) {
+            try {
+              recognitionRef.current.start();
+            } catch (e) {
+              console.error("Auto-restart failed:", e);
+              setIsListening(false);
+            }
+          } else {
+            setIsListening(false);
+            setInterimText("");
+          }
         };
 
         recognitionRef.current = recognition;
@@ -101,11 +118,13 @@ export default function Home() {
     }
 
     if (isListening) {
+      (window as any)._isListeningTarget = false;
       recognitionRef.current.stop();
       setIsListening(false);
       setInterimText("");
     } else {
       try {
+        (window as any)._isListeningTarget = true;
         recognitionRef.current.start();
         setIsListening(true);
         setInterimText("");
