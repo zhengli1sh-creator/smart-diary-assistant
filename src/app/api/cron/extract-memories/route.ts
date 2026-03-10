@@ -101,13 +101,15 @@ export async function GET(req: Request) {
       const { object } = await generateObject({
         model: deepseek('deepseek-chat'),
         schema: ExtractionSchema,
-        prompt: `You are an AI assistant that extracts long-term structural memories and to-do tasks from the user's daily activity logs.
-Your job is to read the chat logs and diary entries for today, and extract high-value facts, user preferences, long-term goals, and actionable to-do items.
+        prompt: `你是一个 AI 助手，负责从用户的每日日志中提取长期结构化记忆和待办任务。
+你的任务是阅读当天的聊天记录和日记，提取出高价值的事实、用户偏好、长期目标以及可执行的待办事项。
 
-Only extract things that are worth remembering for future conversations (e.g. "User's wife's name is Alice", "User prefers studying python in the morning", "User is working on a Next.js project"). 
-For tasks, extract only explicit future intentions (e.g. "I need to call mom tomorrow" -> {title: "Call mom", dueDate: "tomorrow's date"}).
+**核心指令：**
+1. 必须使用 **简体中文** 进行提取和总结。
+2. 只提取值得长期记住的信息（例如：“用户的妻子叫爱丽丝”、“用户偏好在早晨学习 Python”、“用户正在做一个 Next.js 项目”）。
+3. 对于任务，只提取明确的未来意图（例如：“我明天需要给妈妈打个电话” -> {title: "给妈妈打电话", dueDate: "明天的日期"}）。
 
-User Logs for ${targetDate}:
+用户日志日期 ${targetDate}:
 ${compiledText}
 `,
       });
