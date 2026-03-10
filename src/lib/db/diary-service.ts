@@ -72,26 +72,22 @@ export async function updateDiaryEntry(
     summary?: string;
   },
 ) {
-  try {
-    const updateData: any = {};
-    if (entry.category) updateData.category = entry.category;
-    if (entry.content) updateData.content = entry.content;
-    if (entry.mood !== undefined) updateData.mood = entry.mood;
-    if (entry.date) updateData.date = entry.date;
-    if (entry.summary !== undefined) updateData.summary = entry.summary;
+  const updateData: any = {};
+  if (entry.category) updateData.category = entry.category;
+  if (entry.content) updateData.content = entry.content;
+  if (entry.mood !== undefined) updateData.mood = entry.mood;
+  if (entry.date) updateData.date = entry.date;
+  if (entry.summary !== undefined) updateData.summary = entry.summary;
 
-    if (Object.keys(updateData).length > 0) {
-      await db.update(diaryEntries)
-        .set(updateData)
-        .where(
-          and(
-            eq(diaryEntries.id, id),
-            eq(diaryEntries.userId, userId)
-          )
-        );
-    }
-  } catch (error) {
-    console.error('Failed to update diary entry:', error);
+  if (Object.keys(updateData).length > 0) {
+    await db.update(diaryEntries)
+      .set(updateData)
+      .where(
+        and(
+          eq(diaryEntries.id, id),
+          eq(diaryEntries.userId, userId)
+        )
+      );
   }
 }
 
