@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import { Send, Mic, Calendar, Settings, AlertTriangle, LogOut, LogIn, Brain } from "lucide-react";
+import { Send, Mic, Calendar, Settings, AlertTriangle, LogOut, LogIn, Brain, Mail } from "lucide-react";
 import Link from "next/link";
 import { useChat } from "ai/react";
 import { signOut, signIn, useSession } from "next-auth/react";
@@ -174,9 +174,24 @@ export default function Home() {
           <Link href="/vault" className="hover:text-purple-500 transition-colors" title="记忆库 (Memory Vault)">
             <Brain size={20} />
           </Link>
-          <button className="hover:text-gray-600 transition-colors">
+          <a 
+            href="https://calendar.google.com" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="hover:text-blue-500 transition-colors" 
+            title="查看 Google 日历"
+          >
             <Calendar size={20} />
-          </button>
+          </a>
+          <a 
+            href="https://mail.google.com" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="hover:text-red-500 transition-colors" 
+            title="查看 Gmail 邮箱"
+          >
+            <Mail size={20} />
+          </a>
           
           <div className="relative">
             <button 
