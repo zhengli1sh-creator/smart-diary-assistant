@@ -3,6 +3,7 @@ import { getMemories } from "@/lib/db/memory-service";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Brain, Briefcase, Heart, Lightbulb, Target } from "lucide-react";
+import ManualExtractButton from "./ManualExtractButton";
 
 export default async function VaultPage() {
   const session = await auth();
@@ -50,8 +51,10 @@ export default async function VaultPage() {
         </header>
         
         <main className="p-4 bg-gray-50/50 min-h-[calc(100vh-73px)]">
+          <ManualExtractButton />
+          
           {memories.length === 0 ? (
-            <div className="mt-10 bg-white rounded-2xl p-8 text-center text-gray-500 shadow-sm border border-gray-100">
+            <div className="mt-4 bg-white rounded-2xl p-8 text-center text-gray-500 shadow-sm border border-gray-100">
               <Brain className="w-12 h-12 text-gray-300 mx-auto mb-4 opacity-50" />
               <p className="font-medium text-gray-600 mb-2">记忆库还是空的</p>
               <p className="text-sm">系统每天凌晨会自动从你的日记中提炼客观事实、个人偏好和长期目标。</p>
