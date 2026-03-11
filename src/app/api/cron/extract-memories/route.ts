@@ -49,7 +49,22 @@ export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const dateParam = url.searchParams.get('date');
-    const targetDate = dateParam || new Date().toISOString().split('T')[0];
+    
+    // Default to yesterday if running in the early morning (before 6 AM)
+    let targetDate = dateParam;
+    if (!targetDate) {
+      const now = new Date();
+      // Adjust to UTC+8 if server is in UTC (Vercel default)
+      const beijingHour = (now.getUTCHours() + 8) % 24;
+      
+      if (beijingHour < 6) {
+        // It's early morning, we want to summarize "yesterday"
+        const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        targetDate = yesterday.toISOString().split('T')[0];
+      } else {
+        targetDate = now.toISOString().split('T')[0];
+      }
+    }
     
     // Convert targetDate to millisecond boundaries for accurate querying
     const startOfDay = new Date(`${targetDate}T00:00:00.000Z`);
