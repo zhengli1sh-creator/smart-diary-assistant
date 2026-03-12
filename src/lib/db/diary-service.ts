@@ -71,25 +71,40 @@ export async function updateDiaryEntry(
     date?: string;
     summary?: string;
   },
-) {
-  const updateData: any = {};
+): Promise<{ id: string }> {
+  const updateData: Partial<typeof diaryEntries.$inferInsert> = {};
   if (entry.category) updateData.category = entry.category;
   if (entry.content) updateData.content = entry.content;
   if (entry.mood !== undefined) updateData.mood = entry.mood;
   if (entry.date) updateData.date = entry.date;
   if (entry.summary !== undefined) updateData.summary = entry.summary;
 
-  if (Object.keys(updateData).length > 0) {
-    await db.update(diaryEntries)
-      .set(updateData)
-      .where(
-        and(
-          eq(diaryEntries.id, id),
-          eq(diaryEntries.userId, userId)
-        )
-      );
+  if (Object.keys(updateData).length === 0) {
+    throw new Error('未提供可更新字段');
   }
+
+  const existing = await db
+    .select({ id: diaryEntries.id })
+    .from(diaryEntries)
+    .where(and(eq(diaryEntries.id, id), eq(diaryEntries.userId, userId)))
+    .limit(1);
+
+  if (existing.length === 0) {
+    throw new Error('未找到可更新的日记记录，可能 ID 不存在或不属于当前用户');
+  }
+
+  await db.update(diaryEntries)
+    .set(updateData)
+    .where(
+      and(
+        eq(diaryEntries.id, id),
+        eq(diaryEntries.userId, userId)
+      )
+    );
+
+  return { id };
 }
+
 
 /**
  * Query diary entries with optional filters.
